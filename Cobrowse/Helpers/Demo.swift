@@ -10,7 +10,19 @@ import CobrowseSDK
 enum Demo {
     @AppStorage("demo_id")
     static var id = ""
-    
+
+    @AppStorage("license")
+    static var license = "trial"
+
+    @AppStorage("api")
+    static var api = "https://cobrowse.io"
+
+    @AppStorage("device_name")
+    static var deviceName = "Trial iOS Device"
+
+    @AppStorage("device_email")
+    static var deviceEmail = "ios@example.com"
+
     @AppStorage("isAppetize")
     static var isAppetize = false
     
@@ -30,15 +42,15 @@ enum Demo {
             let deviceName = "AppClip iOS Device (\(deviceID))"
             let userEmail = "appclip-\(deviceID)@example.com"
             #else
-            let license = "trial"
-            let deviceName = "Trial iOS Device"
-            let userEmail = "ios@example.com"
+            let license = Demo.license
+            let deviceName = Demo.deviceName
+            let userEmail = Demo.deviceEmail
             #endif
             
             let cobrowse = CobrowseIO.instance()
             
             cobrowse.license = license
-            cobrowse.api = "https://cobrowse.io"
+            cobrowse.api = Demo.api
             cobrowse.capabilities = ["arrows", "disappearing_ink", "drawing", "keypress", "laser", "pointer", "rectangles"]
             cobrowse.customData = [
                 "demo_id": Demo.id,
