@@ -6,7 +6,7 @@
 //
 // Nothing in the views themselves takes part in this. A screen does not opt in
 // from its own body, and a pushed destination is no different from any other
-// screen — `HostingRootRedaction` works out which view a destination is showing
+// screen — `HostingControllerApproval` works out which view a destination is showing
 // and asks this file about it.
 
 // MARK: - SwiftUI screens
@@ -18,17 +18,12 @@ extension MakePaymentPathView: ApprovedForCobrowse {}
 extension ExplainMyBillView: ApprovedForCobrowse {}
 extension ContactUsView: ApprovedForCobrowse {}
 extension PaymentReviewView: ApprovedForCobrowse {}
-//
-// Deliberately absent, and worth reading as the point of the demo:
-//
-//   PaymentDetailsView  — card number, expiry, CVV, cardholder name
-//   JourneyAView        — never classified by anyone
-//   ExplainMyBillView   — was approved; removed, to watch it go black
-//   ContactUsView       — harmless content, never approved, so never shown
+extension ApprovedPresentationView: ApprovedForCobrowse {}
 
 // MARK: - UIKit screens
 
-extension MakePaymentViewController: ApprovedForCobrowse {}
-extension PaymentReviewViewController: ApprovedForCobrowse {}
-
 //extension ViewController: ApprovedForCobrowse {}
+
+//extension MakePaymentViewController: ApprovedForCobrowse {}
+extension ApprovedPresentationViewController: ApprovedForCobrowse {}
+//extension PaymentReviewViewController: ApprovedForCobrowse {}

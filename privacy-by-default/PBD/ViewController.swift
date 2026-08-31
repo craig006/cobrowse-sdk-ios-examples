@@ -50,6 +50,12 @@ class ViewController: UIViewController {
         let uiKitPaymentButton = makeButton(title: "Make Payment (UIKit)", style: .tinted)
         uiKitPaymentButton.addTarget(self, action: #selector(uiKitPaymentTapped), for: .touchUpInside)
 
+        let playgroundButton = makeButton(title: "Presentations (SwiftUI)", style: .tinted)
+        playgroundButton.addTarget(self, action: #selector(playgroundTapped), for: .touchUpInside)
+
+        let uiKitPlaygroundButton = makeButton(title: "Presentations (UIKit)", style: .tinted)
+        uiKitPlaygroundButton.addTarget(self, action: #selector(uiKitPlaygroundTapped), for: .touchUpInside)
+
 
         let stack = UIStackView(arrangedSubviews: [
             titleLabel,
@@ -60,7 +66,10 @@ class ViewController: UIViewController {
             spacer(height: 4),
             paymentButton,
             pathNavButton,
-            uiKitPaymentButton
+            uiKitPaymentButton,
+            spacer(height: 4),
+            playgroundButton,
+            uiKitPlaygroundButton
         ])
         stack.axis = .vertical
         stack.spacing = 12
@@ -108,6 +117,14 @@ class ViewController: UIViewController {
 
     @objc private func paymentTapped() {
         router?.present(MakePaymentView())
+    }
+
+    @objc private func playgroundTapped() {
+        router?.present(ApprovedPresentationView(depth: 0))
+    }
+
+    @objc private func uiKitPlaygroundTapped() {
+        present(ApprovedPresentationViewController(depth: 0), animated: true)
     }
 
     @objc private func uiKitPaymentTapped() {
