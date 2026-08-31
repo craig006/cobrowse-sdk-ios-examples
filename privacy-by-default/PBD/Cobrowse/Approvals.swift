@@ -17,6 +17,7 @@ extension MakePaymentView: ApprovedForCobrowse {}
 extension MakePaymentPathView: ApprovedForCobrowse {}
 extension ExplainMyBillView: ApprovedForCobrowse {}
 extension ContactUsView: ApprovedForCobrowse {}
+extension PaymentReviewView: ApprovedForCobrowse {}
 //
 // Deliberately absent, and worth reading as the point of the demo:
 //
@@ -26,5 +27,8 @@ extension ContactUsView: ApprovedForCobrowse {}
 //   ContactUsView       — harmless content, never approved, so never shown
 
 // MARK: - UIKit screens
+
+extension MakePaymentViewController: ApprovedForCobrowse {}
+extension PaymentReviewViewController: ApprovedForCobrowse {}
 
 //extension ViewController: ApprovedForCobrowse {}

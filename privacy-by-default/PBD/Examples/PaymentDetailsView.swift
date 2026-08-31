@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PaymentDetailsView: View {
     let amount: String
-    let onPay: () -> Void
+    let onEntered: (SavedCard) -> Void
 
     @State private var cardNumber: String = ""
     @State private var expiry: String = ""
@@ -38,9 +38,9 @@ struct PaymentDetailsView: View {
 
             Section {
                 Button {
-                    onPay()
+                    onEntered(.entered(number: cardNumber))
                 } label: {
-                    Text("Pay £\(amount)")
+                    Text("Continue to review")
                         .frame(maxWidth: .infinity)
                         .bold()
                 }
@@ -49,7 +49,7 @@ struct PaymentDetailsView: View {
                 .listRowBackground(Color.clear)
             }
         }
-        .navigationTitle("Card Details")
+        .navigationTitle("New Payment Method")
         .navigationBarTitleDisplayMode(.inline)
         .frameworkPill()
     }

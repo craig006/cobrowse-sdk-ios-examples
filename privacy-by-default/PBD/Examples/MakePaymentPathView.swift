@@ -23,6 +23,10 @@ struct CardDetailsRoute: Hashable {}
 
 struct ExplainBillRoute: Hashable {}
 
+struct PaymentReviewRoute: Hashable {
+    let card: SavedCard
+}
+
 /// `NavigationStack` driven by a typed path, as a contrast with
 /// `MakePaymentView`'s boolean destinations.
 ///
@@ -37,7 +41,7 @@ struct MakePaymentPathView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var path = NavigationPath()
-    @State private var amount: String = "0.00"
+    @State private var amount: String = "10.00"
 
     var body: some View {
         NavigationStack(path: $path) {
@@ -46,9 +50,20 @@ struct MakePaymentPathView: View {
                     HStack {
                         Text("£")
                             .foregroundStyle(.secondary)
-                        TextField("0.00", text: $amount)
+                        TextField("Amount", text: $amount)
                             .keyboardType(.decimalPad)
                             .cobrowseRedacted()
+                    }
+                }
+
+                Section("Pay with") {
+                    ForEach(SavedCard.onFile) { card in
+                        Button {
+                            path.append(PaymentReviewRoute(card: card))
+                        } label: {
+                            SavedCardRowView(card: card)
+                        }
+                        .foregroundStyle(.primary)
                     }
                 }
 
@@ -56,7 +71,7 @@ struct MakePaymentPathView: View {
                     Button {
                         path.append(CardDetailsRoute())
                     } label: {
-                        Text("Continue")
+                        Text("Add new payment method")
                             .frame(maxWidth: .infinity)
                             .bold()
                     }
@@ -78,7 +93,10 @@ struct MakePaymentPathView: View {
             .navigationTitle("Make Payment (path)")
             .navigationBarTitleDisplayMode(.inline)
             .navigationDestination(for: CardDetailsRoute.self) { _ in
-                PaymentDetailsView(amount: amount) { path.removeLast() }
+                PaymentDetailsView(amount: amount.isEmpty ? "0.00" : amount) { path.append(PaymentReviewRoute(card: $0)) }
+            }
+            .navigationDestination(for: PaymentReviewRoute.self) { route in
+                PaymentReviewView(amount: amount.isEmpty ? "0.00" : amount, card: route.card) { dismiss() }
             }
             .navigationDestination(for: ExplainBillRoute.self) { _ in
                 ExplainMyBillView()

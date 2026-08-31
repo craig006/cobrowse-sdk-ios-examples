@@ -47,6 +47,9 @@ class ViewController: UIViewController {
         let pathNavButton = makeButton(title: "Make Payment (path)", style: .tinted)
         pathNavButton.addTarget(self, action: #selector(pathNavTapped), for: .touchUpInside)
 
+        let uiKitPaymentButton = makeButton(title: "Make Payment (UIKit)", style: .tinted)
+        uiKitPaymentButton.addTarget(self, action: #selector(uiKitPaymentTapped), for: .touchUpInside)
+
 
         let stack = UIStackView(arrangedSubviews: [
             titleLabel,
@@ -56,7 +59,8 @@ class ViewController: UIViewController {
             journeyBButton,
             spacer(height: 4),
             paymentButton,
-            pathNavButton
+            pathNavButton,
+            uiKitPaymentButton
         ])
         stack.axis = .vertical
         stack.spacing = 12
@@ -104,6 +108,10 @@ class ViewController: UIViewController {
 
     @objc private func paymentTapped() {
         router?.present(MakePaymentView())
+    }
+
+    @objc private func uiKitPaymentTapped() {
+        navigationController?.pushViewController(MakePaymentViewController(), animated: true)
     }
 
     @objc private func pathNavTapped() {

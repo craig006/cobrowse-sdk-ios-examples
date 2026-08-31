@@ -14,13 +14,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     /// Held for the session's lifetime — `CobrowseIO` does not retain it.
     private let redactionDelegate = RedactByDefaultDelegate()
 
+    /// The other policy: everything visible, and only text matching a pattern
+    /// hidden. Assign this to `cobrowse.delegate` instead to see it. It reads
+    /// UIKit text only — `MakePaymentViewController` and
+    /// `PaymentDetailsViewController` are here to give it something to read.
+    private let regexRedactionDelegate = RedactedByRegexDelegate()
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
         HostingRootRedaction.install()
 
         let cobrowse = CobrowseIO.instance()
         cobrowse.license = "ste"
-        cobrowse.delegate = redactionDelegate
+        cobrowse.delegate = regexRedactionDelegate
         cobrowse.start()
 
         return true
