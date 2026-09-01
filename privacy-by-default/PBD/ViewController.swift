@@ -22,10 +22,10 @@ class ViewController: UIViewController {
         subtitleLabel.textAlignment = .center
         subtitleLabel.numberOfLines = 0
 
-        let journeyAButton = makeButton(title: "Journey A", style: .filled)
+        let journeyAButton = makeButton(title: "Approved Journey", style: .filled)
         journeyAButton.addTarget(self, action: #selector(journeyATapped), for: .touchUpInside)
 
-        let journeyBButton = makeButton(title: "Journey B", style: .filled)
+        let journeyBButton = makeButton(title: "Unapproved Journey", style: .filled)
         journeyBButton.addTarget(self, action: #selector(journeyBTapped), for: .touchUpInside)
 
         let paymentButton = makeButton(title: "Make Payment", style: .tinted)
@@ -131,12 +131,13 @@ class ViewController: UIViewController {
         return v
     }
 
+    @State var isCustomerCompliant: Bool = false
     @objc private func journeyATapped() {
-        router?.show(JourneyAView())
+        router?.show(ApprovedJourneyView())
     }
 
     @objc private func journeyBTapped() {
-        router?.show(JourneyBView())
+        router?.show(UnapprovedJourneyView())
     }
 
     @objc private func paymentTapped() {
@@ -193,4 +194,8 @@ private extension UIButton.Configuration {
         case filled
         case tinted
     }
+}
+
+class MyController<Content: View>: UIHostingController<Content> {
+
 }

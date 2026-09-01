@@ -47,6 +47,6 @@ struct PaymentReviewView: View {
         .navigationTitle("Review")
         .navigationBarTitleDisplayMode(.inline)
         .closable()
-        .viewDetails(isApproved: isApproved)
+        .printAncestry()
     }
 }

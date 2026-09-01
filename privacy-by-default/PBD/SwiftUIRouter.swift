@@ -41,6 +41,7 @@ final class SwiftUIRouter {
     }
 
     private func hostingController<Screen: View>(for screen: Screen) -> UIViewController {
-        UIHostingController(rootView: screen)
+        MyController(rootView: screen)
     }
 }
+

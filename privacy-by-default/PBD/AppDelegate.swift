@@ -21,13 +21,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     /// hidden. Assign this to `cobrowse.delegate` instead to see it. It reads
     /// UIKit text only — `MakePaymentViewController` and
     /// `PaymentDetailsViewController` are here to give it something to read.
-    private let regexRedactionDelegate = RedactedByRegexDelegate()
+//    private let regexRedactionDelegate = RedactedByRegexDelegate()
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
 
         let cobrowse = CobrowseIO.instance()
-        cobrowse.license = "ste"
-        
+        cobrowse.license = "D2cpcHPf7C473g"
+        cobrowse.api = "https://staging.cbrws.io"
         cobrowse.delegate = redactionDelegate
         cobrowse.unredactedViews = [
             "UIEditingOverlayGestureView",

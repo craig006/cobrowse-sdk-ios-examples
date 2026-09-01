@@ -33,67 +33,77 @@ struct MakePaymentView: View {
 
     var body: some View {
         NavigationStack {
-            Form {
-                Section("Amount") {
-                    HStack {
-                        Text("£")
-                            .foregroundStyle(.secondary)
-                        TextField("Amount", text: $amount)
-                            .keyboardType(.decimalPad)
-                            .cobrowseRedacted()
-                    }
-                }
-
-                Section("Pay with") {
-                    ForEach(SavedCard.onFile) { card in
-                        Button {
-                            reviewingSavedCard = card
-                        } label: {
-                            SavedCardRowView(card: card)
+            if #available(iOS 17.0, *) {
+                Form {
+                    Section("Amount") {
+                        HStack {
+                            Text("£")
+                                .foregroundStyle(.secondary)
+                            TextField("Amount", text: $amount)
+                                .keyboardType(.decimalPad)
+                                .cobrowseRedacted()
                         }
-                        .foregroundStyle(.primary)
+                    }
+                    
+                    Section("Pay with") {
+                        ForEach(SavedCard.onFile) { card in
+                            Button {
+                                reviewingSavedCard = card
+                            } label: {
+                                SavedCardRowView(card: card)
+                            }
+                            .foregroundStyle(.primary)
+                        }
+                    }
+                    
+                    Section {
+                        Button {
+                            showingDetails = true
+                        } label: {
+                            Text("Add new payment method")
+                                .frame(maxWidth: .infinity)
+                                .bold()
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
+                        
+                        Button {
+                            showingExplainMyBill = true
+                        } label: {
+                            Text("Explain My Bill")
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
                     }
                 }
-
-                Section {
-                    Button {
-                        showingDetails = true
-                    } label: {
-                        Text("Add new payment method")
-                            .frame(maxWidth: .infinity)
-                            .bold()
+                .navigationTitle("Make Payment")
+                .navigationBarTitleDisplayMode(.inline)
+                .navigationDestination(isPresented: $showingDetails) {
+                    if #available(iOS 17.0, *) {
+                        PaymentDetailsView(amount: amount) { reviewingNewCard = $0 }
+                            .navigationDestination(item: $reviewingNewCard) { card in
+                                PaymentReviewView(amount: amount, card: card) { dismiss() }
+                            }
+                            
+                    } else {
+                        // Fallback on earlier versions
                     }
-                    .buttonStyle(.borderedProminent)
-                    .listRowInsets(EdgeInsets())
-                    .listRowBackground(Color.clear)
-
-                    Button {
-                        showingExplainMyBill = true
-                    } label: {
-                        Text("Explain My Bill")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.bordered)
-                    .listRowInsets(EdgeInsets())
-                    .listRowBackground(Color.clear)
                 }
+                .navigationDestination(item: $reviewingSavedCard) { card in
+                    PaymentReviewView(amount: amount, card: card) { dismiss() }
+                }
+                .navigationDestination(isPresented: $showingExplainMyBill) {
+                    ExplainMyBillView()
+                }
+                .closable()
+                .printAncestry()
+                .cobrowseApprovedScreen()
+            } else {
+                // Fallback on earlier versions
             }
-            .navigationTitle("Make Payment")
-            .navigationBarTitleDisplayMode(.inline)
-            .navigationDestination(isPresented: $showingDetails) {
-                PaymentDetailsView(amount: amount) { reviewingNewCard = $0 }
-                    .navigationDestination(item: $reviewingNewCard) { card in
-                        PaymentReviewView(amount: amount, card: card) { dismiss() }
-                    }
-            }
-            .navigationDestination(item: $reviewingSavedCard) { card in
-                PaymentReviewView(amount: amount, card: card) { dismiss() }
-            }
-            .navigationDestination(isPresented: $showingExplainMyBill) {
-                ExplainMyBillView()
-            }
-            .closable()
-            .viewDetails(isApproved: isApproved)
         }
         .closesModal()
     }

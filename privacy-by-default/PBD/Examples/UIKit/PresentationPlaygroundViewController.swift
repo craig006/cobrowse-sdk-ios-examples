@@ -39,7 +39,7 @@ class PresentationPlaygroundViewController: UIViewController, UIPopoverPresentat
         addViewDetails()
 
         let title = UILabel()
-        title.text = "\(isApproved ? "Approved" : "Unapproved") · depth \(depth)"
+        title.text = "PLACEHOLDER" // "\(isApproved ? "Approved" : "Unapproved") · depth \(depth)"
         title.font = .preferredFont(forTextStyle: .title2)
         title.textAlignment = .center
 

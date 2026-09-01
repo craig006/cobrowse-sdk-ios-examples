@@ -20,6 +20,5 @@ struct JourneyBView: View {
         }
         .padding()
         .navigationTitle("Journey B")
-        .viewDetails(isApproved: isApproved)
     }
 }

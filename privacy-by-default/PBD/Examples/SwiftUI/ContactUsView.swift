@@ -47,6 +47,5 @@ struct ContactUsView: View {
         .navigationTitle("Contact Us")
         .navigationBarTitleDisplayMode(.inline)
         .closable()
-        .viewDetails(isApproved: isApproved)
     }
 }

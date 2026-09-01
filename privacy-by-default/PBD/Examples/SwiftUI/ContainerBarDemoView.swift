@@ -35,6 +35,5 @@ struct ContainerBarDemoView: View {
                 .padding()
                 .background(.thinMaterial)
         }
-        .viewDetails(isApproved: isApproved)
     }
 }

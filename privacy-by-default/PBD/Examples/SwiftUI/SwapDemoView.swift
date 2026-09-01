@@ -16,9 +16,8 @@ struct ApprovedSwapView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            Text(isApproved ? "Approved" : "Unapproved")
+            Text("Approved")
                 .font(.largeTitle).bold()
-                .foregroundStyle(isApproved ? .green : .red)
 
             Text("Swap replaces the `rootView` of this `UIHostingController`. The controller never changes, only the view inside it, so redaction follows what is on screen, not what the controller was when it appeared.")
                 .font(.footnote)
@@ -30,7 +29,6 @@ struct ApprovedSwapView: View {
                 .controlSize(.large)
         }
         .padding()
-        .viewDetails(isApproved: isApproved)
     }
 }
 
@@ -40,9 +38,8 @@ struct UnapprovedSwapView: View {
 
     var body: some View {
         VStack(spacing: 16) {
-            Text(isApproved ? "Approved" : "Unapproved")
+            Text("Unapproved")
                 .font(.largeTitle).bold()
-                .foregroundStyle(isApproved ? .green : .red)
             
 
             Text("Swap replaces the `rootView` of this `UIHostingController`. The controller never changes, only the view inside it, so redaction follows what is on screen, not what the controller was when it appeared.")
@@ -55,6 +52,5 @@ struct UnapprovedSwapView: View {
                 .controlSize(.large)
         }
         .padding()
-        .viewDetails(isApproved: isApproved)
     }
 }

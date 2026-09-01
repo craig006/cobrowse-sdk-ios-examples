@@ -42,6 +42,7 @@ struct ExplainMyBillView: View {
         .navigationDestination(isPresented: $showingContactUs) {
             ContactUsView()
         }
-        .viewDetails(isApproved: isApproved)
+        .printAncestry()
+        .cobrowseApprovedScreen()
     }
 }

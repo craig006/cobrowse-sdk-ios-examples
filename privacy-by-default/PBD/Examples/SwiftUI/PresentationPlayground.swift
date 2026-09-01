@@ -17,7 +17,8 @@ struct ApprovedPresentationView: View {
     let depth: Int
 
     var body: some View {
-        PresentationPlayground(depth: depth, isApproved: isApproved)
+        PresentationPlayground(depth: depth, isApproved: true)
+            .cobrowseApprovedScreen()
     }
 }
 
@@ -27,7 +28,8 @@ struct UnapprovedPresentationView: View {
     let depth: Int
 
     var body: some View {
-        PresentationPlayground(depth: depth, isApproved: isApproved)
+        PresentationPlayground(depth: depth, isApproved: true)
+            .printAncestry()
     }
 }
 

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import CobrowseSDK
 
 /// Card entry — the screen with something genuinely worth hiding on it.
 struct PaymentDetailsView: View {
@@ -53,6 +54,7 @@ struct PaymentDetailsView: View {
         .navigationTitle("New Payment Method")
         .navigationBarTitleDisplayMode(.inline)
         .closable()
-        .viewDetails(isApproved: isApproved)
+        .printAncestry()
     }
 }
+

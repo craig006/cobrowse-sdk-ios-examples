@@ -31,9 +31,9 @@ extension UIViewController {
     }
 
     private func approvalPill() -> UIView {
-        let tint: UIColor = isApproved ? .systemGreen : .systemRed
+        let tint: UIColor = .systemGreen
 
-        let image = UIImageView(image: UIImage(systemName: isApproved ? "eye" : "eye.slash"))
+        let image = UIImageView(image: UIImage(systemName: "eye"))
         image.tintColor = tint
         image.contentMode = .scaleAspectFit
 

@@ -36,7 +36,6 @@ struct ApprovedTabView: View {
                 .navigationTitle("Tabs (SwiftUI)")
                 .navigationBarTitleDisplayMode(.inline)
                 .closable()
-                .viewDetails(isApproved: isApproved)
         }
         .closesModal()
     }
@@ -50,6 +49,8 @@ struct ApprovedTabView: View {
                 .font(.title).monospacedDigit()
         }
         .padding()
+        .cobrowseApprovedScreen()
+        .printAncestry()
     }
 }
 
@@ -64,7 +65,6 @@ struct UnapprovedTabView: View {
                 .navigationTitle("Tabs (SwiftUI)")
                 .navigationBarTitleDisplayMode(.inline)
                 .closable()
-                .viewDetails(isApproved: isApproved)
         }
         .closesModal()
     }
