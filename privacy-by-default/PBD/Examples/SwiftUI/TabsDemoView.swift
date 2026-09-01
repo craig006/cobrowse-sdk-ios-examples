@@ -8,17 +8,7 @@ import SwiftUI
 struct TabsDemoView: View {
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Drawn in this screen's OWN view rather than in any tab, so it
-            // measures whether content sitting beside a container is covered.
-            // A hosting controller with children contributes nothing to the
-            // redacted set, because covering it would cover the tabs inside.
-            Text("Account 12345678")
-                .font(.callout.monospacedDigit())
-                .padding(8)
-
-            tabs
-        }
+        tabs
     }
 
     private var tabs: some View {

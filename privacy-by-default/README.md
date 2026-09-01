@@ -103,8 +103,8 @@ the content, and it brought the transition flicker back.
 Put such content inside the screen it belongs to, where it is covered like any
 other, or mark it with `.cobrowseRedacted()`.
 
-**Two examples demonstrate it**: the account number above the tabs in
-`TabsDemoView`, and the balance bar in `ContainerBarDemoView`.
+**`ContainerBarDemoView` demonstrates it** — an unapproved screen whose balance
+bar reaches the agent while the rest of it is black.
 
 ### These stay hidden — the screen cannot be named
 
