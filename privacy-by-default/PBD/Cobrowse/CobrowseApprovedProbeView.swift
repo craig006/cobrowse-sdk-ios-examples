@@ -19,6 +19,7 @@ extension View {
 private struct ApprovedScreenProbe: UIViewRepresentable {
     func makeUIView(context: Context) -> ApprovedScreenProbeView { ApprovedScreenProbeView() }
     func updateUIView(_ uiView: ApprovedScreenProbeView, context: Context) { }
+    static func dismantleUIView(_ uiView: ApprovedScreenProbeView, coordinator: ()) { uiView.dismantle() }
 }
 
 private class ApprovedScreenProbeView: UIView {
@@ -30,6 +31,10 @@ private class ApprovedScreenProbeView: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    func dismantle() {
+        removeUnredaction()
     }
 
     override func didMoveToWindow() {
@@ -45,11 +50,13 @@ private class ApprovedScreenProbeView: UIView {
 
     private func removeUnredaction() {
         guard let view = findAncestorForUnredaction() else { return }
+        print("[] Removing unredaction")
         UnredactionRegistry.shared.remove(view)
     }
 
     private func addUnredaction() {
         guard let view = findAncestorForUnredaction() else { return }
+        print("[] Adding unredaction")
         UnredactionRegistry.shared.add(view)
     }
 

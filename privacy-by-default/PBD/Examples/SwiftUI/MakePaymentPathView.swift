@@ -104,6 +104,7 @@ struct MakePaymentPathView: View {
                 ExplainMyBillView()
             }
             .closable()
+            .cobrowseApprovedScreen()
         }
         .closesModal()
     }

@@ -29,6 +29,7 @@ struct ApprovedSwapView: View {
                 .controlSize(.large)
         }
         .padding()
+        .cobrowseApprovedScreen()
     }
 }
 
