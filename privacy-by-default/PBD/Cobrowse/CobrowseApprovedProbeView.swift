@@ -6,8 +6,36 @@ import CobrowseSDK
 
 // MARK: - Usage
 
-class CobrowseApprovedProbeView: UIView {
+extension View {
+    func cobrowseApprovedScreen() -> some View {
+        background(
+            ApprovedScreenProbe()
+                .printAncestry()
+        )
+    }
+}
+
+/// An invisible probe view that allows automatically unredacting an approved screen's view.
+private struct ApprovedScreenProbe: UIViewRepresentable {
+    func makeUIView(context: Context) -> ApprovedScreenProbeView { ApprovedScreenProbeView() }
+    func updateUIView(_ uiView: ApprovedScreenProbeView, context: Context) { }
+}
+
+private class ApprovedScreenProbeView: UIView {
+    init() {
+        super.init(frame: .zero)
+        self.isUserInteractionEnabled = false
+        self.alpha = 0
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
     override func didMoveToWindow() {
+        // This view only exists on approved screens. When it's added to a window
+        // automatically unredact the SwiftUI host UIKit view.
+        // When it's removed, remove the unredaction as well.
         if window == nil {
             removeUnredaction()
         } else {
@@ -40,35 +68,7 @@ class CobrowseApprovedProbeView: UIView {
     }
 }
 
-struct CobrowseApprovedViewRepresentable: UIViewRepresentable {
-    func makeUIView(context: Context) -> CobrowseApprovedProbeView {
-        CobrowseApprovedProbeView()
-    }
 
-    func updateUIView(_ uiView: CobrowseApprovedProbeView, context: Context) { }
-}
 
-extension View {
-    func cobrowseApprovedScreen() -> some View {
-        background(
-            CobrowseApprovedViewRepresentable()
-        )
-    }
-}
 
-class UnredactionRegistry {
-    static let shared = UnredactionRegistry()
-    private var unredacted = NSHashTable<UIView>.weakObjects()
 
-    var all: [UIView] {
-        unredacted.allObjects
-    }
-
-    func add(_ view: UIView) {
-        unredacted.add(view)
-    }
-
-    func remove(_ view: UIView) {
-        unredacted.remove(view)
-    }
-}

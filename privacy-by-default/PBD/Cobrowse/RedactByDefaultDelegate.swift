@@ -12,6 +12,8 @@ final class RedactByDefaultDelegate: NSObject, CobrowseIODelegate {
     }
 
     func cobrowseUnredactedViews(for viewController: UIViewController) -> [UIView] {
+        // The `.cobrowseApprovedScreen` modifier adds the first HostView of the SwiftUI view that
+        // it's applied to to the UnredactionRegistry
         return UnredactionRegistry.shared.all
     }
 
