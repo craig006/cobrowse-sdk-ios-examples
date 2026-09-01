@@ -12,7 +12,7 @@ final class RedactByDefaultDelegate: NSObject, CobrowseIODelegate {
     }
 
     func cobrowseUnredactedViews(for viewController: UIViewController) -> [UIView] {
-        return []
+        return UnredactionRegistry.shared.all
     }
 
     func cobrowseSessionDidUpdate(_ session: CBIOSession) {}

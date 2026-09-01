@@ -8,21 +8,35 @@ import CobrowseSDK
 
 class CobrowseApprovedProbeView: UIView {
     override func didMoveToWindow() {
-        guard window != nil else { return }
-        var parent = self.superview
+        if window == nil {
+            removeUnredaction()
+        } else {
+            addUnredaction()
+        }
+    }
 
+    private func removeUnredaction() {
+        guard let view = findAncestorForUnredaction() else { return }
+        UnredactionRegistry.shared.remove(view)
+    }
+
+    private func addUnredaction() {
+        guard let view = findAncestorForUnredaction() else { return }
+        UnredactionRegistry.shared.add(view)
+    }
+
+    private func findAncestorForUnredaction() -> UIView? {
+        var parent = self.superview
         while let current = parent {
             let name = String(describing: type(of: current))
 
             // Might be a better way to type check this.
             if name == "HostingView" || name.starts(with: "_UIHostingView") {
-                print("Found view, unredacting...")
-                // This must go into a registry so that we can remove. Or the sdk must allow removing.
-                current.cobrowseUnredacted()
-                return
+                return current
             }
             parent = current.superview
         }
+        return nil
     }
 }
 
@@ -39,5 +53,22 @@ extension View {
         background(
             CobrowseApprovedViewRepresentable()
         )
+    }
+}
+
+class UnredactionRegistry {
+    static let shared = UnredactionRegistry()
+    private var unredacted = NSHashTable<UIView>.weakObjects()
+
+    var all: [UIView] {
+        unredacted.allObjects
+    }
+
+    func add(_ view: UIView) {
+        unredacted.add(view)
+    }
+
+    func remove(_ view: UIView) {
+        unredacted.remove(view)
     }
 }
