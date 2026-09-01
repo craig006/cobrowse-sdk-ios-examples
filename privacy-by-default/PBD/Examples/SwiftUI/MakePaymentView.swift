@@ -92,12 +92,9 @@ struct MakePaymentView: View {
             .navigationDestination(isPresented: $showingExplainMyBill) {
                 ExplainMyBillView()
             }
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-            }
-            .frameworkPill()
+            .closable()
+            .viewDetails(isApproved: isApproved)
         }
+        .closesModal()
     }
 }

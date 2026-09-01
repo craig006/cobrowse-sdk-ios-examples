@@ -14,6 +14,8 @@ import SwiftUI
 /// to costs nothing but a black rectangle.
 struct ContactUsView: View {
 
+    @Environment(\.dismiss) private var dismiss
+
     private let numbers = [
         ("General enquiries", "0800 123 4567"),
         ("Billing", "0800 123 4568"),
@@ -44,6 +46,7 @@ struct ContactUsView: View {
         }
         .navigationTitle("Contact Us")
         .navigationBarTitleDisplayMode(.inline)
-        .frameworkPill()
+        .closable()
+        .viewDetails(isApproved: isApproved)
     }
 }

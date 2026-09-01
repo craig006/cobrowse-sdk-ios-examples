@@ -46,6 +46,7 @@ struct PaymentReviewView: View {
         }
         .navigationTitle("Review")
         .navigationBarTitleDisplayMode(.inline)
-        .frameworkPill()
+        .closable()
+        .viewDetails(isApproved: isApproved)
     }
 }

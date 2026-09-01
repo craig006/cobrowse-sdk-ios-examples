@@ -1,5 +1,5 @@
 //
-//  JourneyAView.swift
+//  JourneyBView.swift
 //  PBD
 //
 //  Created by Ste on 29/08/2026.
@@ -7,18 +7,18 @@
 
 import SwiftUI
 
-struct JourneyAView: View {
+struct JourneyBView: View {
     var body: some View {
         VStack(spacing: 16) {
-            Text("Journey A")
+            Text("Journey B")
                 .font(.largeTitle).bold()
 
-            Text("The first journey in the flow.")
+            Text("The second journey in the flow.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
         .padding()
-        .navigationTitle("Journey A")
-        .frameworkPill()
+        .navigationTitle("Journey B")
+        .viewDetails(isApproved: isApproved)
     }
 }

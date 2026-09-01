@@ -42,7 +42,11 @@ extension RedactionPattern {
 extension Array where Element == RedactionPattern {
 
     /// Everything worth hiding by its content, in the order it is tried.
-    static let all: [RedactionPattern] = [.maskedCardNumber, .cardNumber, .keyword]
+    static let all: [RedactionPattern] = [
+        .maskedCardNumber,
+        .cardNumber,
+        .keyword
+    ]
 }
 
 /// Redacts any view whose visible text matches one of a set of patterns.
@@ -63,7 +67,9 @@ final class RedactedByRegexDelegate: NSObject, CobrowseIODelegate {
     }
 
     func cobrowseRedactedViews(for viewController: UIViewController) -> [UIView] {
-        guard let root = viewController.viewIfLoaded else { return [] }
+        
+        guard let root = viewController.viewIfLoaded
+            else { return [] }
 
         // Views belonging to a child view controller are left to that
         // controller: the SDK tracks every controller that has appeared and
@@ -97,9 +103,11 @@ final class RedactedByRegexDelegate: NSObject, CobrowseIODelegate {
         skipping childRoots: Set<UIView>,
         into found: inout [UIView]
     ) {
+        
         // Hidden and transparent both apply to everything below, so the whole
         // subtree goes with them.
-        guard view.isHidden == false, view.alpha > 0 else { return }
+        guard view.isHidden == false, view.alpha > 0
+            else { return }
 
         if view.bounds.isEmpty == false,
            let textual = view as? ShowsText,
@@ -140,6 +148,7 @@ final class RedactedByRegexDelegate: NSObject, CobrowseIODelegate {
     /// First, not all: one match is enough to hide the view, so there is
     /// nothing to learn from the rest.
     private func firstMatch(in text: String) -> RedactionPattern? {
+        
         patterns.first { text.contains($0.regex) }
     }
 
@@ -163,7 +172,9 @@ extension ShowsText {
 
     /// Drops what is absent or empty, so callers can list candidates plainly.
     func onScreen(_ candidates: String?...) -> [String] {
-        candidates.compactMap { $0 }.filter { $0.isEmpty == false }
+        candidates
+            .compactMap { $0 }
+            .filter { $0.isEmpty == false }
     }
 }
 

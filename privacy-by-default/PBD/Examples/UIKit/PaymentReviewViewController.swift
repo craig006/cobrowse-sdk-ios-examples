@@ -26,7 +26,8 @@ final class PaymentReviewViewController: UIViewController {
 
         title = "Review"
         view.backgroundColor = .systemGroupedBackground
-        addFrameworkPill()
+        addViewDetails()
+        addCloseButton()
 
         let column = UIStackView(arrangedSubviews: [
             row(title: "Amount", value: "£\(amount)"),

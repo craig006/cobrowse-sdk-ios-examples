@@ -51,6 +51,7 @@ struct PaymentDetailsView: View {
         }
         .navigationTitle("New Payment Method")
         .navigationBarTitleDisplayMode(.inline)
-        .frameworkPill()
+        .closable()
+        .viewDetails(isApproved: isApproved)
     }
 }

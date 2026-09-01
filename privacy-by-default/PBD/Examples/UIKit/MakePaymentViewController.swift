@@ -21,7 +21,7 @@ final class MakePaymentViewController: UIViewController {
 
         title = "Make Payment"
         view.backgroundColor = .systemGroupedBackground
-        addFrameworkPill()
+        addViewDetails()
 
         let amountLabel = UILabel()
         amountLabel.text = "Amount"

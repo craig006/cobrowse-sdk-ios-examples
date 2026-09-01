@@ -11,6 +11,8 @@ import SwiftUI
 /// from one screen to the next rather than one screen at a time.
 struct ExplainMyBillView: View {
 
+    @Environment(\.dismiss) private var dismiss
+
     @State private var showingContactUs = false
 
     var body: some View {
@@ -36,9 +38,10 @@ struct ExplainMyBillView: View {
         .padding()
         .navigationTitle("Explain My Bill")
         .navigationBarTitleDisplayMode(.inline)
+        .closable()
         .navigationDestination(isPresented: $showingContactUs) {
             ContactUsView()
         }
-        .frameworkPill()
+        .viewDetails(isApproved: isApproved)
     }
 }

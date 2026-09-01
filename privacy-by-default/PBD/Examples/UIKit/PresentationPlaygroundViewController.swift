@@ -9,36 +9,19 @@ import UIKit
 // identical bodies, one approved and one not, each able to present either at
 // the next depth as a sheet, a cover or a popover.
 
-final class ApprovedPresentationViewController: PresentationPlaygroundViewController {
+// Nothing but the type name differs — which is the point: approval is per type,
+// and each reads its own from the policy.
 
-    init(depth: Int) {
-        super.init(depth: depth, approved: true)
-    }
+final class ApprovedPresentationViewController: PresentationPlaygroundViewController {}
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
-
-final class UnapprovedPresentationViewController: PresentationPlaygroundViewController {
-
-    init(depth: Int) {
-        super.init(depth: depth, approved: false)
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
+final class UnapprovedPresentationViewController: PresentationPlaygroundViewController {}
 
 class PresentationPlaygroundViewController: UIViewController, UIPopoverPresentationControllerDelegate {
 
     private let depth: Int
-    private let approved: Bool
 
-    init(depth: Int, approved: Bool) {
+    init(depth: Int) {
         self.depth = depth
-        self.approved = approved
         super.init(nibName: nil, bundle: nil)
     }
 
@@ -50,41 +33,32 @@ class PresentationPlaygroundViewController: UIViewController, UIPopoverPresentat
         super.viewDidLoad()
 
         view.backgroundColor = .systemBackground
-        addFrameworkPill()
+        addViewDetails()
 
         let title = UILabel()
-        title.text = "\(approved ? "Approved" : "Unapproved") · depth \(depth)"
+        title.text = "\(isApproved ? "Approved" : "Unapproved") · depth \(depth)"
         title.font = .preferredFont(forTextStyle: .title2)
         title.textAlignment = .center
 
         let subtitle = UILabel()
-        subtitle.text = approved ? "In Approvals.swift" : "Deliberately not approved"
+        subtitle.text = approvalDescription
         subtitle.font = .preferredFont(forTextStyle: .subheadline)
         subtitle.textColor = .secondaryLabel
         subtitle.textAlignment = .center
 
+        let headers = row(of: [
+            header("Approved", color: .systemGreen), header("Unapproved", color: .systemRed)
+        ])
+
         let rows = [UIModalPresentationStyle.pageSheet, .overFullScreen, .popover].map { style in
-            let row = UIStackView(arrangedSubviews: [
-                button(style, approved: true), button(style, approved: false)
-            ])
-            row.axis = .horizontal
-            row.spacing = 8
-            row.distribution = .fillEqually
-            return row
+            row(of: [button(style, approved: true), button(style, approved: false)])
         }
 
-        let column = UIStackView(arrangedSubviews: [title, subtitle] + rows)
+        let column = UIStackView(arrangedSubviews: [title, subtitle, headers] + rows)
         column.axis = .vertical
         column.spacing = 12
         column.setCustomSpacing(24, after: subtitle)
         column.translatesAutoresizingMaskIntoConstraints = false
-
-        if depth > 0 {
-            let dismissButton = UIButton(configuration: .plain())
-            dismissButton.setTitle("Dismiss", for: .normal)
-            dismissButton.addTarget(self, action: #selector(dismissTapped), for: .touchUpInside)
-            column.addArrangedSubview(dismissButton)
-        }
 
         view.addSubview(column)
 
@@ -95,13 +69,41 @@ class PresentationPlaygroundViewController: UIViewController, UIPopoverPresentat
         ])
     }
 
+    private func row(of views: [UIView]) -> UIStackView {
+        let row = UIStackView(arrangedSubviews: views)
+        row.axis = .horizontal
+        row.spacing = 8
+        row.distribution = .fillEqually
+        return row
+    }
+
+    /// Names the column, so each button does not have to repeat it.
+    private func header(_ title: String, color: UIColor) -> UILabel {
+        let label = UILabel()
+        label.text = title
+        label.font = .preferredFont(forTextStyle: .subheadline).withWeight(.semibold)
+        label.textColor = color
+        label.textAlignment = .center
+        return label
+    }
+
     private func button(_ style: UIModalPresentationStyle, approved: Bool) -> UIButton {
         var configuration = UIButton.Configuration.bordered()
-        configuration.title = "\(name(for: style)) · \(approved ? "approved" : "unapproved")"
+        configuration.title = name(for: style)
         configuration.baseForegroundColor = approved ? .systemGreen : .systemRed
+        // Tinted fill, matching the SwiftUI twin: approved and unapproved should
+        // be tellable apart without reading the label.
+        configuration.baseBackgroundColor = (approved ? UIColor.systemGreen : .systemRed)
+            .withAlphaComponent(0.15)
+        configuration.cornerStyle = .capsule
+        configuration.buttonSize = .large
+        // One line, or a wrapped title makes its row taller than the others and
+        // the grid stops being a grid. `titleLabel` cannot say this — a
+        // configuration owns the title, and settings on the label are ignored.
+        configuration.titleLineBreakMode = .byTruncatingTail
         configuration.titleTextAttributesTransformer = .init { attributes in
             var attributes = attributes
-            attributes.font = .preferredFont(forTextStyle: .footnote)
+            attributes.font = .preferredFont(forTextStyle: .subheadline)
             return attributes
         }
 
@@ -127,21 +129,19 @@ class PresentationPlaygroundViewController: UIViewController, UIPopoverPresentat
             ? ApprovedPresentationViewController(depth: depth + 1)
             : UnapprovedPresentationViewController(depth: depth + 1)
 
-        next.modalPresentationStyle = style
+        let presented = next.closable
+        presented.modalPresentationStyle = style
 
         if style == .popover {
-            next.preferredContentSize = CGSize(width: 320, height: 380)
-            next.popoverPresentationController?.sourceView = sender
-            next.popoverPresentationController?.sourceRect = sender.bounds
-            next.popoverPresentationController?.delegate = self
+            presented.preferredContentSize = CGSize(width: 380, height: 380)
+            presented.popoverPresentationController?.sourceView = sender
+            presented.popoverPresentationController?.sourceRect = sender.bounds
+            presented.popoverPresentationController?.delegate = self
         }
 
-        present(next, animated: true)
+        present(presented, animated: true)
     }
 
-    @objc private func dismissTapped() {
-        dismiss(animated: true)
-    }
 
     /// Keeps a popover a popover on iPhone, rather than adapting to a sheet.
     func adaptivePresentationStyle(
@@ -149,5 +149,12 @@ class PresentationPlaygroundViewController: UIViewController, UIPopoverPresentat
         traitCollection: UITraitCollection
     ) -> UIModalPresentationStyle {
         .none
+    }
+}
+
+private extension UIFont {
+
+    func withWeight(_ weight: UIFont.Weight) -> UIFont {
+        UIFont.systemFont(ofSize: pointSize, weight: weight)
     }
 }

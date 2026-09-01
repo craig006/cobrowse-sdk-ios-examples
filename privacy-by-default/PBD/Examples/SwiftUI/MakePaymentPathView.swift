@@ -101,12 +101,9 @@ struct MakePaymentPathView: View {
             .navigationDestination(for: ExplainBillRoute.self) { _ in
                 ExplainMyBillView()
             }
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-            }
-            .frameworkPill()
+            .closable()
+            .viewDetails(isApproved: isApproved)
         }
+        .closesModal()
     }
 }

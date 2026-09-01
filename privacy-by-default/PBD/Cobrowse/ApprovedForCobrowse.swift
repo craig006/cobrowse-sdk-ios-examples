@@ -1,33 +1,41 @@
-//
-//  ApprovedForCobrowse.swift
-//  PBD
-//
+import SwiftUI
+import UIKit
 
-import Foundation
-
-/// The whole redaction policy of this app, in one protocol.
-///
-/// A screen is hidden from the Cobrowse agent unless its type is declared
-/// approved. Nothing opts *out* — absence of approval **is** the redaction, so
-/// a screen added tomorrow and forgotten today is already private.
-///
-/// It marks types in both worlds, and `RedactByDefaultDelegate` is the only
-/// thing that reads it:
-/// - a SwiftUI `View` type, matched against a hosting controller's root view
-/// - a `UIViewController` type, matched against the controller itself
-///
-/// Every conformance lives in `Approvals.swift`. That file is the allowlist.
 protocol ApprovedForCobrowse {}
 
-/// Asks the allowlist about a screen type.
 enum CobrowseApproval {
 
-    /// Whether the agent may see this type.
-    ///
-    /// Types that are not approved — and types nobody has classified at all —
-    /// both answer `false`. There is deliberately no third answer: the policy
-    /// fails closed, so the only way to become visible is to say so.
     static func approves(_ type: Any.Type) -> Bool {
         type is any ApprovedForCobrowse.Type
     }
+
+    /// What an example screen says about itself.
+    ///
+    /// Read from the policy rather than written into the screen, so changing
+    /// `Approvals.swift` changes what every example claims — a screen can never
+    /// describe itself as approved while the policy denies it.
+    static func description(of type: Any.Type) -> String {
+        description(isApproved: approves(type))
+    }
+
+    static func description(isApproved: Bool) -> String {
+        isApproved ? "In Approvals.swift" : "Deliberately not approved"
+    }
+}
+
+// The same two, once per framework. `type(of: self)` reads the same in both: a
+// view's concrete struct type, a controller's actual subclass.
+
+extension View {
+
+    var isApproved: Bool { CobrowseApproval.approves(type(of: self)) }
+
+    var approvalDescription: String { CobrowseApproval.description(of: type(of: self)) }
+}
+
+extension UIViewController {
+
+    var isApproved: Bool { CobrowseApproval.approves(type(of: self)) }
+
+    var approvalDescription: String { CobrowseApproval.description(of: type(of: self)) }
 }

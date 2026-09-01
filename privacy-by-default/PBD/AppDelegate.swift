@@ -24,7 +24,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         let cobrowse = CobrowseIO.instance()
         cobrowse.license = "ste"
+        
         cobrowse.delegate = redactionDelegate
+        cobrowse.unredactedViews = [
+            "FloatingBarContainerView",
+            "_UIFloatingBarContainerView",
+            "_UIRoundedRectShadowView",
+            "_UIPopoverDimmingView",
+            "_UIPopoverShapeLayerChromeView",
+        ]
+        
+        // Uncomment for debug help
+//        HostDump.isEnabled = true
+
         cobrowse.start()
 
         return true

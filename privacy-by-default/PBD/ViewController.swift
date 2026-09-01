@@ -1,15 +1,7 @@
-//
-//  ViewController.swift
-//  PBD
-//
-//  Created by Ste on 29/08/2026.
-//
-
 import UIKit
 import SwiftUI
 
 class ViewController: UIViewController {
-
     private lazy var router: SwiftUIRouter? = {
         guard let navigationController else { return nil }
         return SwiftUIRouter(navigationController: navigationController)
@@ -18,18 +10,12 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        title = "UIKit"
+        title = "Examples"
         view.backgroundColor = .systemGroupedBackground
-        addFrameworkPill()
-
-        let titleLabel = UILabel()
-        titleLabel.text = "UIKit View Controller"
-        titleLabel.font = .systemFont(ofSize: 28, weight: .bold)
-        titleLabel.textColor = .label
-        titleLabel.textAlignment = .center
+        addViewDetails()
 
         let subtitleLabel = UILabel()
-        subtitleLabel.text = "Pick a destination — journeys push onto the nav stack, payment is presented modally."
+        subtitleLabel.text = "Every screen is hidden from the agent until Approvals.swift names it. The eye on each screen shows which it is."
         subtitleLabel.font = .systemFont(ofSize: 15, weight: .regular)
         subtitleLabel.textColor = .secondaryLabel
         subtitleLabel.textAlignment = .center
@@ -53,12 +39,19 @@ class ViewController: UIViewController {
         let playgroundButton = makeButton(title: "Presentations (SwiftUI)", style: .tinted)
         playgroundButton.addTarget(self, action: #selector(playgroundTapped), for: .touchUpInside)
 
+        let tabsButton = makeButton(title: "Tabs (SwiftUI)", style: .tinted)
+        tabsButton.addTarget(self, action: #selector(tabsTapped), for: .touchUpInside)
+
+        let uiKitTabsButton = makeButton(title: "Tabs (UIKit)", style: .tinted)
+        uiKitTabsButton.addTarget(self, action: #selector(uiKitTabsTapped), for: .touchUpInside)
+
+        let swapButton = makeButton(title: "Swapping root (SwiftUI)", style: .tinted)
+        swapButton.addTarget(self, action: #selector(swapTapped), for: .touchUpInside)
+
         let uiKitPlaygroundButton = makeButton(title: "Presentations (UIKit)", style: .tinted)
         uiKitPlaygroundButton.addTarget(self, action: #selector(uiKitPlaygroundTapped), for: .touchUpInside)
 
-
         let stack = UIStackView(arrangedSubviews: [
-            titleLabel,
             subtitleLabel,
             spacer(height: 8),
             journeyAButton,
@@ -69,19 +62,35 @@ class ViewController: UIViewController {
             uiKitPaymentButton,
             spacer(height: 4),
             playgroundButton,
-            uiKitPlaygroundButton
+            uiKitPlaygroundButton,
+            spacer(height: 4),
+            tabsButton,
+            uiKitTabsButton,
+            spacer(height: 4),
+            swapButton
         ])
         stack.axis = .vertical
         stack.spacing = 12
         stack.alignment = .fill
         stack.setCustomSpacing(24, after: subtitleLabel)
         stack.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(stack)
+
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.alwaysBounceVertical = true
+        scrollView.addSubview(stack)
+        view.addSubview(scrollView)
 
         NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+
+            stack.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: 24),
+            stack.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor, constant: -32),
             stack.leadingAnchor.constraint(equalTo: view.layoutMarginsGuide.leadingAnchor, constant: 8),
-            stack.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor, constant: -8),
-            stack.centerYAnchor.constraint(equalTo: view.centerYAnchor)
+            stack.trailingAnchor.constraint(equalTo: view.layoutMarginsGuide.trailingAnchor, constant: -8)
         ])
     }
 
@@ -123,19 +132,31 @@ class ViewController: UIViewController {
         router?.present(ApprovedPresentationView(depth: 0))
     }
 
+    @objc private func tabsTapped() {
+        let hosting = UIHostingController(rootView: TabsDemoView())
+        hosting.modalPresentationStyle = .fullScreen
+        present(hosting, animated: true)
+    }
+
+    @objc private func uiKitTabsTapped() {
+        let tabs = TabsDemoViewController().closable
+        tabs.modalPresentationStyle = .fullScreen
+        present(tabs, animated: true)
+    }
+
     @objc private func uiKitPlaygroundTapped() {
-        present(ApprovedPresentationViewController(depth: 0), animated: true)
+        present(ApprovedPresentationViewController(depth: 0).closable, animated: true)
     }
 
     @objc private func uiKitPaymentTapped() {
-        navigationController?.pushViewController(MakePaymentViewController(), animated: true)
+        present(MakePaymentViewController().closable, animated: true)
+    }
+
+    @objc private func swapTapped() {
+        present(SwapDemoViewController().closable, animated: true)
     }
 
     @objc private func pathNavTapped() {
-        // Deliberately not routed, as a check that nothing in the redaction
-        // policy depends on `SwiftUIRouter`. A hosting controller made by hand
-        // keeps its `rootView`'s type, which is all the allowlist needs — so
-        // this screen behaves exactly as the routed one beside it.
         present(UIHostingController(rootView: MakePaymentPathView()), animated: true)
     }
 }

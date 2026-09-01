@@ -33,7 +33,8 @@ final class PaymentDetailsViewController: UIViewController {
         title = "New Payment Method"
         navigationItem.largeTitleDisplayMode = .never
         view.backgroundColor = .systemGroupedBackground
-        addFrameworkPill()
+        addViewDetails()
+        addCloseButton()
 
         style(cardNumberField, placeholder: "Card number", content: .creditCardNumber)
         cardNumberField.keyboardType = .numberPad
