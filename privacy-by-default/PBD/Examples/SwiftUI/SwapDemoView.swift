@@ -20,6 +20,11 @@ struct ApprovedSwapView: View {
                 .font(.largeTitle).bold()
                 .foregroundStyle(isApproved ? .green : .red)
 
+            Text("Swap replaces the `rootView` of this `UIHostingController`. The controller never changes, only the view inside it, so redaction follows what is on screen, not what the controller was when it appeared.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+
             Button("Swap", action: swap)
                 .buttonStyle(.bordered)
                 .controlSize(.large)
@@ -29,7 +34,6 @@ struct ApprovedSwapView: View {
     }
 }
 
-/// The other. See `ApprovedSwapView`.
 struct UnapprovedSwapView: View {
 
     let swap: () -> Void
@@ -39,9 +43,12 @@ struct UnapprovedSwapView: View {
             Text(isApproved ? "Approved" : "Unapproved")
                 .font(.largeTitle).bold()
                 .foregroundStyle(isApproved ? .green : .red)
+            
 
-            Text("Sort code 04-00-04 · Account 12345678")
-                .font(.callout).monospacedDigit()
+            Text("Swap replaces the `rootView` of this `UIHostingController`. The controller never changes, only the view inside it, so redaction follows what is on screen, not what the controller was when it appeared.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
 
             Button("Swap", action: swap)
                 .buttonStyle(.bordered)

@@ -33,9 +33,9 @@ struct AlertsDemoView: View {
             Spacer()
         }
         .padding()
-        .navigationTitle("Alerts")
-        .navigationBarTitleDisplayMode(.inline)
-        .closable()
+        // Presented without a navigation stack, so there is no bar for the X to
+        // sit in.
+        .closableOverContent()
         .viewDetails(isApproved: isApproved)
         .alert("Confirm payment", isPresented: $showingAlert) {
             TextField("Security code", text: $securityCode)

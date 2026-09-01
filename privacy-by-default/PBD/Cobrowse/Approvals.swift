@@ -2,7 +2,7 @@ extension JourneyBView: ApprovedForCobrowse {}
 
 extension MakePaymentView: ApprovedForCobrowse {}
 extension MakePaymentPathView: ApprovedForCobrowse {}
-extension ExplainMyBillView: ApprovedForCobrowse {}
+//extension ExplainMyBillView: ApprovedForCobrowse {}
 extension ContactUsView: ApprovedForCobrowse {}
 extension PaymentReviewView: ApprovedForCobrowse {}
 
@@ -17,4 +17,4 @@ extension AlertsDemoView: ApprovedForCobrowse {}
 //extension PaymentReviewViewController: ApprovedForCobrowse {}
 //extension ApprovedPresentationViewController: ApprovedForCobrowse {}
 //extension ApprovedTabViewController: ApprovedForCobrowse {}
-extension AlertsDemoViewController: ApprovedForCobrowse {}
+//extension AlertsDemoViewController: ApprovedForCobrowse {}
