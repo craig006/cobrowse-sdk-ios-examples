@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// The other half of the pair. See `JourneyAView`.
 struct JourneyBView: View {
     var body: some View {
         VStack(spacing: 16) {

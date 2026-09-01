@@ -1,210 +1,159 @@
 # PBD — private by default
 
-A Cobrowse redaction example for UIKit and SwiftUI, focused on `NavigationStack`
-and on whitelisting the destinations a stack pushes.
+A Cobrowse redaction example for UIKit and SwiftUI. Every screen is hidden from
+the agent, and one file decides which ones are shown.
+
+No view in this app carries a redaction modifier. Nothing in the examples knows
+the policy exists.
 
 ## The rule
 
 **Everything is hidden. `Approvals.swift` is the only thing that reveals.**
 
-A screen added next year is private the first time it is shown, with nobody
-having remembered anything. No view in this app carries a redaction modifier —
-`Approvals.swift` names every screen the agent may see, destinations included:
-
 ```swift
 extension MakePaymentView: ApprovedForCobrowse {}
-extension MakePaymentPathView: ApprovedForCobrowse {}
-extension JourneyBView: ApprovedForCobrowse {}
+extension ExplainMyBillView: ApprovedForCobrowse {}
+extension ContactUsView: ApprovedForCobrowse {}
 ```
 
-```
-RedactByDefaultDelegate  redacts every window; lifts that from a hosting
-                         controller once HostingRootRedaction has decided
+A screen written next year is private the first time it is shown, with nobody
+having remembered anything. Approving one is a line; forgetting to costs a black
+rectangle.
 
-HostingRootRedaction     redacts a hosting controller's root IN SWIFTUI, or
-                         leaves it revealed when the allowlist approves it
-```
+The protocol is empty — the conformance *is* the statement, and it can be
+written here without touching the type it approves.
 
-## Walkthrough
+## Running it
 
-### The two questions
+Every example carries two pills, bottom right: which framework drew it, and an
+eye — green where the policy approves it, red and slashed where it does not.
+Both are read from `Approvals.swift`, so a screen can never claim to be approved
+while the policy denies it.
 
-Everything reduces to two decisions, asked about different things at different
-moments.
+Watch the session from the agent side to see what is actually sent. The device
+shows everything normally either way.
 
-```
-  RedactByDefaultDelegate                 HostingRootRedaction
-  asked by the SDK, per redaction pass    runs on every layout pass
-  ────────────────────────────────────    ─────────────────────────────────
+## How it works
 
-  "which views are hidden?"               "is this root still redacted?"
-      → every window                          yes → done. nothing else runs,
-                                                    and this is the usual answer
-  "which views are revealed?"                 no  → decide:
-      → approved controllers                        redact unless the allowlist
-                                                    clearly allows this view
-```
+Two questions, asked of every view controller, independently.
 
-The first is coarse — a whole window, a whole controller's view. The second is
-what governs anything SwiftUI hosts, because the first cannot reach it.
+**What is covered** — `cobrowseRedactedViews(for:)` covers every screen in the
+app's own window *without consulting approval*. There is no decision to get
+wrong, so a screen nobody thought about is still covered.
 
-The right-hand column runs often but rarely does much. A redacted view answers
-the first question and stops there; the wrapper it already carries *is* the
-stored verdict, so the allowlist is not consulted again while it stands. The
-decision below it runs only when a view has never been judged, or when SwiftUI
-has dropped the wrapper and it has to be judged afresh.
+A container is the exception: it contributes its bars rather than its own view,
+because its view contains its children's. Covering it would cover them — and
+would blank the screen through every transition, since a push puts views on
+screen that belong to no controller and nothing reveals those. A container we
+don't recognise covers itself, so an unfamiliar one is hidden rather than
+skipped.
 
-### What happens when a screen appears
+**What comes back** — `cobrowseUnredactedViews(for:)` reveals nothing but a
+screen `Approvals.swift` names, and of that screen only its own view. A screen
+never reveals its neighbours, its chrome, or anything presented over it.
+Returning nothing leaves the cover standing, so silence is always safe.
 
-```
-  viewWillLayoutSubviews
-          │
-          ├── not a UIHostingController<AnyView> ──────────── nothing to do
-          │      (the app made it; it kept its type)
-          │
-          └── erased root ─── may it show its content?
-                                 │
-                    ┌────────────┴────────────┐
-                   yes                        no / cannot tell
-                    │                             │
-              leave it alone              wrap its root in
-                                          .cobrowseRedacted()
+Chrome is denied by default: a navigation title can name a screen the agent is
+not meant to know about. Two commented blocks in `cobrowseUnredactedViews` turn
+it back on.
 
-  ── later, whenever the SDK recomputes ──
+## Naming a screen
 
-  cobrowseUnredactedViews(for: controller)
-          │
-          └── is it approved? ── yes ── hand back [controller.view]
-                              └─ no ─── hand back nothing
-```
+The hard part is not the policy, it is working out **which screen a view
+controller is showing**. `ViewType.swift` does that, and its surface is two
+names: `viewType` is a fact read off the type system, `foundViewType` is a
+search that can fail.
 
-### The decision, in pseudo-code
+SwiftUI makes several controllers the app never asks for, and only one carries
+the screen's type plainly:
 
 ```
-may this controller's view be revealed?          # RedactByDefaultDelegate
-
-    if it still knows its root view's type       # the app hosted it
-        → is that type in Approvals.swift?
-
-    if its root is AnyView                       # SwiftUI hosted it
-        → is it already redacted in SwiftUI, or clearly allowed to show?
-
-    if it has children                           # a UIKit container
-        → no; its view is an ancestor of theirs
-
-    otherwise                                    # a UIKit leaf
-        → is it in Approvals.swift?
-
-
-may this SwiftUI root show its content?          # HostingRootRedaction
-
-    which view does the nearest ancestor host?
-        not approved            → no
-
-    am I the first screen in my navigation stack?
-        yes                     → yes, I am that approved screen's own content
-
-    otherwise I am a destination — which view am I?
-        exactly one named       → is it in Approvals.swift?
-        several, or none        → cannot tell, so no
+UIHostingController<MakePaymentView>        the app hosted it — the type IS the screen
+NavigationStackHostingController<AnyView>   a stack's root and each destination
+PresentationHostingController<AnyView>      a sheet, cover or popover
+TabHostingController                        hosts a SwiftUI-internal RootView
 ```
 
-### A worked example
+So three routes:
 
-Three screens deep, in one stack, with the allowlist as it ships:
+1. **Read the type.** Where the hosted content is not `AnyView`, it is the screen.
+2. **Look inside the box.** For an erased view, reflect one hop — the storage's
+   own type names what it wraps.
+3. **Ask elsewhere.** A tab is named by its container's `Body` plus its index; a
+   stack's root, which is never readable, counts as the screen containing it.
+
+Every route fails closed. A screen that cannot be named stays hidden.
+
+## Limitations
+
+Measured on iOS 26.5 against SDK 3.19.2. **The first fails open**, the rest
+fail closed.
+
+### Content drawn around a container is visible
+
+A screen that draws its own content *around* a `NavigationStack` or `TabView` —
+a balance bar, a banner, a mini player, usually via `.overlay`,
+`.safeAreaInset` or a wrapping stack — leaves that content **visible to the
+agent**, even where the screen itself is not approved.
+
+SwiftUI draws it into the same view that holds the stack, so there is nothing
+separate to cover. Covering that view was measured and rejected: it did not hide
+the content, and it brought the transition flicker back.
+
+Put such content inside the screen it belongs to, where it is covered like any
+other, or mark it with `.cobrowseRedacted()`.
+
+**Two examples demonstrate it**: the account number above the tabs in
+`TabsDemoView`, and the balance bar in `ContainerBarDemoView`.
+
+### These stay hidden — the screen cannot be named
+
+- **A `switch` in a destination closure.** The static type names every branch, so
+  nothing can say which is showing.
+- **A destination declared with another screen's modifier attached** —
+  `PaymentDetailsView().navigationDestination(item:) { PaymentReviewView() }` —
+  names two views in one type. Declaring the destination inside the view's own
+  `body`, or using a `NavigationPath`, avoids it.
+- **A conditional tab.** `if flag { B() }` names a tab that may not exist, so the
+  whole `TabView` becomes unidentifiable.
+- **A screen defined in a third-party UI module.** Approval reads types from the
+  app's own module; anything else is treated as a framework's.
+
+### Windows above the app's own
+
+The policy speaks only for the app's own window. The keyboard is redacted by the
+SDK itself, and alerts turn out to live in the app's window — but an overlay
+window an app creates for a toast or HUD would not be covered.
+
+## Debugging
+
+`HostDump` prints the live controller tree, what each controller hosts, and what
+the policy managed to name:
 
 ```
-UINavigationController                                  container      → hidden
-└── ViewController                          UIKit leaf, not listed     → hidden
-    ↳ presented
-      UIHostingController<MakePaymentView>  knows its type, listed     → SHOWN
-        └── UIKitNavigationController                   container      → hidden
-            ├── NavigationStackHosting…<AnyView>   first in stack,
-            │                                      owner approved      → SHOWN
-            ├── NavigationStackHosting…<AnyView>   destination,
-            │                    names ExplainMyBillView, not listed   → hidden
-            └── NavigationStackHosting…<AnyView>   destination,
-            │                    names ContactUsView, not listed       → hidden
+🌳 UIHostingController<MakePaymentView>              hosts: MakePaymentView  found: MakePaymentView
+🌳     UIKitNavigationController                     —  found: UNREADABLE
+🌳         NavigationStackHostingController<AnyView> hosts: AnyView  found: MakePaymentView
 ```
 
-Read the middle column downward and the whole design is visible: the app's own
-screen is answered by name, its stack's root screen is answered by its owner,
-and each destination is answered by the view its erased root names.
+A controller marked `⚠️ NEVER ASKED` is one the SDK does not track — no policy
+can cover it. Enable it in `AppDelegate` and filter the console on 🌳.
 
-### Where each screen's cover comes from
+## The other policy
 
-Not every hidden screen is hidden by the same thing, and the difference is the
-subtlest part of the design.
+`RedactedByRegexDelegate` is the contrast: it shows every screen and hides text
+matching a pattern. Assign it in `AppDelegate` to compare.
 
-```
-  JourneyAView          the app hosted it, allowlist says no
-                        → its view is never revealed, so THE WINDOW covers it
+It reads UIKit text only — SwiftUI does not draw through `UILabel`, which is why
+UIKit twins of the payment screens exist. It is here to make the argument, not
+as a recommendation: matching content is a poor substitute for knowing which
+screen you are on.
 
-  ExplainMyBillView     SwiftUI hosted it, inside an approved screen
-                        → that screen's view is revealed, and it is an ancestor,
-                          so the window is already lifted here
-                        → THE SWIFTUI REDACTION is the only cover
-```
+## Notes
 
-Which is why an identification that cannot be made has to redact rather than
-abstain: for a destination there is nothing underneath to catch it.
-
-## How a destination is identified
-
-SwiftUI hosts each pushed destination in its own controller — so the SDK is
-asked about it — but erases its root to `AnyView`. The type is still recoverable
-from the erased value, and `_typeByName` resolves it back to a real metatype
-which is then **conformance-tested**, not string-matched:
-
-| The closure | What the erased root names | Answer |
-|---|---|---|
-| returns one view | `ExplainMyBillView` | that view |
-| `switch` over routes | `PaymentDetailsView`, `ExplainMyBillView` | **decide nothing** |
-
-The second row is a real constraint on how an app may declare navigation: a
-`switch` over a route enum has the static type `_ConditionalContent<A, B>`, so
-the erased root names every branch at once and nothing outside can say which is
-showing. Such a destination stays black. `MakePaymentPathView` therefore
-declares one destination per route.
-
-Reading the *built value* would resolve the switch, and leaks: the value graph
-retains views from pushes already dismissed, so a stale approved view answers
-for the screen actually showing. Ambiguity has to stay unanswerable.
-
-## Two timing facts, both measured
-
-- **Redact at `viewWillLayoutSubviews`, not `viewDidLoad`.** At load a
-  controller is not yet in its navigation stack, so a stack root cannot be told
-  apart from a destination. Layout still runs before anything is drawn.
-- **Check on every layout, not once.** SwiftUI reassigns `rootView` on its own
-  updates and discards the wrapper, and there is no hook for it — a destination
-  was once recorded as redacted while carrying no redaction at all.
-
-## Screens
-
-| Screen | Seen by the agent |
-|---|---|
-| `ViewController` | UIKit menu |
-| `MakePaymentView` | yes — stack, boolean destinations |
-| `MakePaymentPathView` | yes — stack, typed path, one destination per route |
-| `JourneyBView` | yes |
-| `ExplainMyBillView` | **no** — a destination, and taken off the list to watch it go black |
-| `ContactUsView` | **no** — public support numbers, never approved, so never shown |
-| `PaymentDetailsView` | **no** — card number, expiry, CVV |
-| `JourneyAView` | **no** — never classified by anyone |
-
-`ContactUsView` is the argument for redaction by default: nothing on it is
-private, and it is hidden anyway, because hidden is what a screen is until
-someone says otherwise.
-
-It sits three deep — `MakePaymentView` → `ExplainMyBillView` → `ContactUsView` —
-so approval can be watched changing from one screen to the next within a single
-stack, rather than one screen at a time.
-
-The amount field on both payment screens carries `cobrowseRedacted()`: the
-screen around it is revealed, so the field says otherwise for itself. Those two
-lines are the only Cobrowse modifiers in the whole app.
-
-`MakePaymentPathView` is presented **without** `SwiftUIRouter`, deliberately —
-nothing in the policy depends on it. A hosting controller made by hand keeps its
-`rootView`'s type, which is all the allowlist needs.
+- `CobrowseIO.redactedViews` and `unredactedViews` take **class names** and must
+  be set **before `start()`**. The list in `AppDelegate` names UIKit's own
+  popover chrome — dimming, shadow and outline views that draw no app content.
+- Only name views that can never be an **ancestor** of app content. An
+  unredaction shields everything beneath it: naming a container there was
+  measured to make unapproved screens visible.

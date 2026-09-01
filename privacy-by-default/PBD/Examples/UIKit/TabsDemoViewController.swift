@@ -51,7 +51,6 @@ final class ApprovedTabViewController: UIViewController {
 
         show(
             title: "Approved tab",
-            detail: approvalDescription,
             figure: "£1,240.55"
         )
     }
@@ -69,7 +68,6 @@ final class UnapprovedTabViewController: UIViewController {
 
         show(
             title: "Unapproved tab",
-            detail: approvalDescription,
             figure: "Sort code 04-00-04 · Account 12345678"
         )
     }
@@ -80,17 +78,11 @@ private extension UIViewController {
     /// A title, a line of explanation and a figure — the same three things both
     /// SwiftUI tabs show, drawn through `UILabel` so the regex policy can read
     /// them too.
-    func show(title: String, detail: String, figure: String) {
+    func show(title: String, figure: String) {
         let titleLabel = UILabel()
         titleLabel.text = title
         titleLabel.font = .preferredFont(forTextStyle: .largeTitle)
 
-        let detailLabel = UILabel()
-        detailLabel.text = detail
-        detailLabel.font = .preferredFont(forTextStyle: .subheadline)
-        detailLabel.textColor = .secondaryLabel
-        detailLabel.numberOfLines = 0
-        detailLabel.textAlignment = .center
 
         let figureLabel = UILabel()
         figureLabel.text = figure
@@ -98,7 +90,7 @@ private extension UIViewController {
         figureLabel.numberOfLines = 0
         figureLabel.textAlignment = .center
 
-        let column = UIStackView(arrangedSubviews: [titleLabel, detailLabel, figureLabel])
+        let column = UIStackView(arrangedSubviews: [titleLabel, figureLabel])
         column.axis = .vertical
         column.spacing = 16
         column.alignment = .center

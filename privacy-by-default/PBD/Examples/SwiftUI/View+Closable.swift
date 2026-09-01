@@ -34,6 +34,7 @@ extension View {
     }
 }
 
+/// Publishes a presentation's own dismiss to everything inside it.
 private struct ModalRoot: ViewModifier {
 
     @Environment(\.dismiss) private var dismiss
@@ -43,6 +44,7 @@ private struct ModalRoot: ViewModifier {
     }
 }
 
+/// The X as a navigation bar item.
 private struct ClosableBar: ViewModifier {
 
     @Environment(\.closeModal) private var closeModal
@@ -57,6 +59,7 @@ private struct ClosableBar: ViewModifier {
     }
 }
 
+/// The X for a screen with no bar to put it in.
 private struct ClosableOverlay: ViewModifier {
 
     @Environment(\.closeModal) private var closeModal
@@ -89,6 +92,7 @@ private struct ClosableOverlay: ViewModifier {
     }
 }
 
+/// The X itself, so both placements draw the same thing.
 private struct CloseLabel: View {
 
     let close: CloseModalAction
@@ -119,6 +123,7 @@ struct CloseModalAction {
     }
 }
 
+/// Carries a presentation root's dismiss down to its pushed screens.
 private struct CloseModalKey: EnvironmentKey {
 
     /// Nothing by default, so a screen with no presentation root above it falls

@@ -70,6 +70,8 @@ extension UIViewController {
     }
 }
 
+/// A label that carries its own padding, so a pill is one view rather than a
+/// label inside a container.
 private final class PaddedLabel: UILabel {
 
     private let insets = UIEdgeInsets(top: 3, left: 8, bottom: 3, right: 8)

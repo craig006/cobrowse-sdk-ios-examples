@@ -25,6 +25,15 @@ enum HostDump {
     /// On every line, so the tree can be filtered out of the frame loop's noise.
     private static let marker = "🌳"
 
+    /// Every controller the SDK has asked about. A controller it never asks
+    /// about cannot be covered by any policy, however the policy is written —
+    /// which is a different problem from covering it wrongly.
+    private static let asked = NSHashTable<UIViewController>.weakObjects()
+
+    static func noteAsked(_ viewController: UIViewController) {
+        asked.add(viewController)
+    }
+
     private static var lastPrinted = Date.distantPast
     private static var lastTree = ""
 
@@ -60,16 +69,15 @@ enum HostDump {
 
     private static func describe(_ viewController: UIViewController, depth: Int = 0) -> String {
         
+        let seen = asked.contains(viewController) ? "" : "  ⚠️ NEVER ASKED"
+
         var line = String(repeating: "    ", count: depth)
-            + "\(type(of: viewController))  \(hosted(by: viewController))\n"
+            + "\(type(of: viewController))  \(hosted(by: viewController))\(seen)\n"
 
         for child in viewController.children {
             line += describe(child, depth: depth + 1)
         }
-
-        // UIKit reports the presented controller on every ancestor, so a
-        // presented branch appears more than once. That is the report being
-        // faithful, not the tree being wrong.
+        
         if let presented = viewController.presentedViewController {
             line += describe(presented, depth: depth + 1)
         }

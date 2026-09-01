@@ -1,6 +1,7 @@
 import UIKit
 import SwiftUI
 
+/// The example list — the only screen that is not itself an example.
 class ViewController: UIViewController {
     private lazy var router: SwiftUIRouter? = {
         guard let navigationController else { return nil }
@@ -48,6 +49,15 @@ class ViewController: UIViewController {
         let swapButton = makeButton(title: "Swapping root (SwiftUI)", style: .tinted)
         swapButton.addTarget(self, action: #selector(swapTapped), for: .touchUpInside)
 
+        let containerBarButton = makeButton(title: "Container bar (SwiftUI)", style: .tinted)
+        containerBarButton.addTarget(self, action: #selector(containerBarTapped), for: .touchUpInside)
+
+        let alertsButton = makeButton(title: "Alerts (SwiftUI)", style: .tinted)
+        alertsButton.addTarget(self, action: #selector(alertsTapped), for: .touchUpInside)
+
+        let uiKitAlertsButton = makeButton(title: "Alerts (UIKit)", style: .tinted)
+        uiKitAlertsButton.addTarget(self, action: #selector(uiKitAlertsTapped), for: .touchUpInside)
+
         let uiKitPlaygroundButton = makeButton(title: "Presentations (UIKit)", style: .tinted)
         uiKitPlaygroundButton.addTarget(self, action: #selector(uiKitPlaygroundTapped), for: .touchUpInside)
 
@@ -67,7 +77,12 @@ class ViewController: UIViewController {
             tabsButton,
             uiKitTabsButton,
             spacer(height: 4),
-            swapButton
+            swapButton,
+            spacer(height: 4),
+            alertsButton,
+            uiKitAlertsButton,
+            spacer(height: 4),
+            containerBarButton
         ])
         stack.axis = .vertical
         stack.spacing = 12
@@ -150,6 +165,18 @@ class ViewController: UIViewController {
 
     @objc private func uiKitPaymentTapped() {
         present(MakePaymentViewController().closable, animated: true)
+    }
+
+    @objc private func containerBarTapped() {
+        router?.present(ContainerBarDemoView())
+    }
+
+    @objc private func alertsTapped() {
+        router?.present(AlertsDemoView())
+    }
+
+    @objc private func uiKitAlertsTapped() {
+        present(AlertsDemoViewController().closable, animated: true)
     }
 
     @objc private func swapTapped() {

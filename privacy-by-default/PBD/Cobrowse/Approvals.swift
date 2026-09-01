@@ -10,9 +10,11 @@ extension TabsDemoView: ApprovedForCobrowse {}
 extension ApprovedTabView: ApprovedForCobrowse {}
 extension ApprovedPresentationView: ApprovedForCobrowse {}
 extension ApprovedSwapView: ApprovedForCobrowse {}
+extension AlertsDemoView: ApprovedForCobrowse {}
 
 //extension ViewController: ApprovedForCobrowse {}
 //extension MakePaymentViewController: ApprovedForCobrowse {}
 //extension PaymentReviewViewController: ApprovedForCobrowse {}
 //extension ApprovedPresentationViewController: ApprovedForCobrowse {}
 //extension ApprovedTabViewController: ApprovedForCobrowse {}
+extension AlertsDemoViewController: ApprovedForCobrowse {}

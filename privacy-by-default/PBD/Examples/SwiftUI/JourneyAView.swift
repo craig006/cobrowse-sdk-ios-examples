@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+/// One of a pair of plain pushed screens, so a push can move between an
+/// approved and an unapproved screen with nothing else differing.
 struct JourneyAView: View {
     var body: some View {
         VStack(spacing: 16) {

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+/// Card entry — the screen with something genuinely worth hiding on it.
 struct PaymentDetailsView: View {
     let amount: String
     let onEntered: (SavedCard) -> Void

@@ -21,8 +21,10 @@ import CobrowseSDK
 /// card details.
 struct CardDetailsRoute: Hashable {}
 
+/// One route type per destination. See `CardDetailsRoute`.
 struct ExplainBillRoute: Hashable {}
 
+/// One route type per destination. See `CardDetailsRoute`.
 struct PaymentReviewRoute: Hashable {
     let card: SavedCard
 }

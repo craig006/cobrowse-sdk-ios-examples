@@ -18,6 +18,8 @@ final class SwapDemoViewController: UIHostingController<AnyView> {
     private var showsApproved = true
 
     init() {
+        // A placeholder, because the real root view needs `self` for its button
+        // and `self` does not exist until `super.init` has run.
         super.init(rootView: AnyView(EmptyView()))
 
         rootView = currentRootView

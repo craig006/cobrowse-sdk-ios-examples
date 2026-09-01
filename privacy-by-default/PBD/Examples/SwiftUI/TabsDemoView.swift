@@ -1,9 +1,24 @@
 import SwiftUI
 
+/// A SwiftUI `TabView`.
+///
+/// Its tabs can only be named from this container's `Body`: each tab's own
+/// controller hosts a SwiftUI-internal type that says nothing about which tab
+/// it is.
 struct TabsDemoView: View {
 
     var body: some View {
-        tabs
+        VStack(spacing: 0) {
+            // Drawn in this screen's OWN view rather than in any tab, so it
+            // measures whether content sitting beside a container is covered.
+            // A hosting controller with children contributes nothing to the
+            // redacted set, because covering it would cover the tabs inside.
+            Text("Account 12345678")
+                .font(.callout.monospacedDigit())
+                .padding(8)
+
+            tabs
+        }
     }
 
     private var tabs: some View {
@@ -20,6 +35,7 @@ struct TabsDemoView: View {
     }
 }
 
+/// One of the tabs. Approval keys on this type.
 struct ApprovedTabView: View {
 
     @Environment(\.dismiss) private var dismiss
@@ -40,11 +56,6 @@ struct ApprovedTabView: View {
             Text("Approved tab")
                 .font(.largeTitle).bold()
 
-            Text(approvalDescription)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-
             Text("£1,240.55")
                 .font(.title).monospacedDigit()
         }
@@ -52,6 +63,7 @@ struct ApprovedTabView: View {
     }
 }
 
+/// Another tab. See `ApprovedTabView`.
 struct UnapprovedTabView: View {
 
     @Environment(\.dismiss) private var dismiss
@@ -71,10 +83,6 @@ struct UnapprovedTabView: View {
         VStack(spacing: 16) {
             Text("Unapproved tab")
                 .font(.largeTitle).bold()
-
-            Text(approvalDescription)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
 
             Text("Sort code 04-00-04 · Account 12345678")
                 .font(.callout).monospacedDigit()

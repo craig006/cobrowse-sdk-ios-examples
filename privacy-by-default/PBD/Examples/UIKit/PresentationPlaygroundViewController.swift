@@ -12,10 +12,13 @@ import UIKit
 // Nothing but the type name differs — which is the point: approval is per type,
 // and each reads its own from the policy.
 
+/// The approved half of the pair.
 final class ApprovedPresentationViewController: PresentationPlaygroundViewController {}
 
+/// The other half.
 final class UnapprovedPresentationViewController: PresentationPlaygroundViewController {}
 
+/// The UIKit twin of `PresentationPlayground`.
 class PresentationPlaygroundViewController: UIViewController, UIPopoverPresentationControllerDelegate {
 
     private let depth: Int
@@ -40,11 +43,6 @@ class PresentationPlaygroundViewController: UIViewController, UIPopoverPresentat
         title.font = .preferredFont(forTextStyle: .title2)
         title.textAlignment = .center
 
-        let subtitle = UILabel()
-        subtitle.text = approvalDescription
-        subtitle.font = .preferredFont(forTextStyle: .subheadline)
-        subtitle.textColor = .secondaryLabel
-        subtitle.textAlignment = .center
 
         let headers = row(of: [
             header("Approved", color: .systemGreen), header("Unapproved", color: .systemRed)
@@ -54,10 +52,10 @@ class PresentationPlaygroundViewController: UIViewController, UIPopoverPresentat
             row(of: [button(style, approved: true), button(style, approved: false)])
         }
 
-        let column = UIStackView(arrangedSubviews: [title, subtitle, headers] + rows)
+        let column = UIStackView(arrangedSubviews: [title, headers] + rows)
         column.axis = .vertical
         column.spacing = 12
-        column.setCustomSpacing(24, after: subtitle)
+        column.setCustomSpacing(24, after: title)
         column.translatesAutoresizingMaskIntoConstraints = false
 
         view.addSubview(column)

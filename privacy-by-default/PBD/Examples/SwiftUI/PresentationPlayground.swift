@@ -10,6 +10,8 @@ import SwiftUI
 // depth, in any style, so any stack of approved and unapproved screens can be
 // built by tapping.
 
+/// The approved half of the pair, identical to `UnapprovedPresentationView` in
+/// everything but its type — which is all approval keys on.
 struct ApprovedPresentationView: View {
 
     let depth: Int
@@ -19,6 +21,7 @@ struct ApprovedPresentationView: View {
     }
 }
 
+/// The other half. See `ApprovedPresentationView`.
 struct UnapprovedPresentationView: View {
 
     let depth: Int
@@ -28,6 +31,10 @@ struct UnapprovedPresentationView: View {
     }
 }
 
+/// The body both halves share.
+///
+/// Presents either type at the next depth in any style, so a stack of approved
+/// and unapproved screens can be built by tapping.
 private struct PresentationPlayground: View {
 
     let depth: Int
@@ -61,13 +68,8 @@ private struct PresentationPlayground: View {
 
     var body: some View {
         VStack(spacing: 20) {
-            VStack(spacing: 6) {
-                Text("\(isApproved ? "Approved" : "Unapproved") · depth \(depth)")
-                    .font(.title2).bold()
-                Text(CobrowseApproval.description(isApproved: isApproved))
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-            }
+            Text("\(isApproved ? "Approved" : "Unapproved") · depth \(depth)")
+                .font(.title2).bold()
 
             grid
 

@@ -30,6 +30,7 @@ extension View {
     }
 }
 
+/// The capsule both details are drawn in.
 private struct DetailPill<Content: View>: View {
 
     let tint: Color

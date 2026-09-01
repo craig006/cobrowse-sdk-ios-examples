@@ -7,6 +7,8 @@
 
 import UIKit
 
+/// Builds the one window, and the navigation controller everything else is
+/// pushed onto or presented from.
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?

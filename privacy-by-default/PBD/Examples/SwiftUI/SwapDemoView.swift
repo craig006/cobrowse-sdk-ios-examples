@@ -9,6 +9,7 @@ import SwiftUI
 // follows the VALUE a controller is showing rather than the controller itself.
 // `SwapDemoViewController` hosts them, and the button swaps which one it holds.
 
+/// One of the two views `SwapDemoViewController` holds.
 struct ApprovedSwapView: View {
 
     let swap: () -> Void
@@ -19,11 +20,6 @@ struct ApprovedSwapView: View {
                 .font(.largeTitle).bold()
                 .foregroundStyle(isApproved ? .green : .red)
 
-            Text(approvalDescription)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .multilineTextAlignment(.center)
-
             Button("Swap", action: swap)
                 .buttonStyle(.bordered)
                 .controlSize(.large)
@@ -33,6 +29,7 @@ struct ApprovedSwapView: View {
     }
 }
 
+/// The other. See `ApprovedSwapView`.
 struct UnapprovedSwapView: View {
 
     let swap: () -> Void
@@ -42,10 +39,6 @@ struct UnapprovedSwapView: View {
             Text(isApproved ? "Approved" : "Unapproved")
                 .font(.largeTitle).bold()
                 .foregroundStyle(isApproved ? .green : .red)
-
-            Text(approvalDescription)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
 
             Text("Sort code 04-00-04 · Account 12345678")
                 .font(.callout).monospacedDigit()

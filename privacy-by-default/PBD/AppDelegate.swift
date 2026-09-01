@@ -9,6 +9,9 @@ import UIKit
 import CobrowseSDK
 
 @main
+/// Starts Cobrowse and chooses the policy.
+///
+/// All three are held here so swapping one in is a single line.
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     /// Held for the session's lifetime — `CobrowseIO` does not retain it.
@@ -27,11 +30,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         cobrowse.delegate = redactionDelegate
         cobrowse.unredactedViews = [
+            "UIEditingOverlayGestureView",
             "FloatingBarContainerView",
             "_UIFloatingBarContainerView",
             "_UIRoundedRectShadowView",
             "_UIPopoverDimmingView",
-            "_UIPopoverShapeLayerChromeView",
+            "_UIPopoverShapeLayerChromeView"
         ]
         
         // Uncomment for debug help

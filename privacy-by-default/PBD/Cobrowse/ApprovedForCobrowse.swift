@@ -1,41 +1,34 @@
 import SwiftUI
 import UIKit
 
+/// Conform a view or a view controller to reveal it to the agent.
+///
+/// Empty on purpose: the conformance *is* the statement, and it can be written
+/// in `Approvals.swift` without touching the type it approves — so nothing in
+/// the app has to know this policy exists.
 protocol ApprovedForCobrowse {}
 
+/// Asks the allowlist about a type.
+///
+/// Takes `Any.Type` rather than a generic, because the caller has a type it
+/// recovered at runtime and cannot name.
 enum CobrowseApproval {
 
     static func approves(_ type: Any.Type) -> Bool {
         type is any ApprovedForCobrowse.Type
     }
-
-    /// What an example screen says about itself.
-    ///
-    /// Read from the policy rather than written into the screen, so changing
-    /// `Approvals.swift` changes what every example claims — a screen can never
-    /// describe itself as approved while the policy denies it.
-    static func description(of type: Any.Type) -> String {
-        description(isApproved: approves(type))
-    }
-
-    static func description(isApproved: Bool) -> String {
-        isApproved ? "In Approvals.swift" : "Deliberately not approved"
-    }
 }
-
-// The same two, once per framework. `type(of: self)` reads the same in both: a
-// view's concrete struct type, a controller's actual subclass.
 
 extension View {
 
-    var isApproved: Bool { CobrowseApproval.approves(type(of: self)) }
-
-    var approvalDescription: String { CobrowseApproval.description(of: type(of: self)) }
+    var isApproved: Bool {
+        CobrowseApproval.approves(type(of: self))
+    }
 }
 
 extension UIViewController {
 
-    var isApproved: Bool { CobrowseApproval.approves(type(of: self)) }
-
-    var approvalDescription: String { CobrowseApproval.description(of: type(of: self)) }
+    var isApproved: Bool {
+        CobrowseApproval.approves(type(of: self))
+    }
 }

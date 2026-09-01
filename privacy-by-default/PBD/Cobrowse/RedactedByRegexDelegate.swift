@@ -8,9 +8,8 @@ import CobrowseSDK
 
 /// One thing worth hiding, and how to recognise it.
 ///
-/// Named and separate so each pattern can stay simple enough to read at a
-/// glance. A single expression covering every case would be the shortest thing
-/// to write and the hardest to be sure of.
+/// Separate patterns rather than one expression, so each stays simple enough to
+/// be sure of.
 struct RedactionPattern {
 
     let name: String
@@ -40,8 +39,7 @@ extension RedactionPattern {
 }
 
 extension Array where Element == RedactionPattern {
-
-    /// Everything worth hiding by its content, in the order it is tried.
+    
     static let all: [RedactionPattern] = [
         .maskedCardNumber,
         .cardNumber,
@@ -49,15 +47,10 @@ extension Array where Element == RedactionPattern {
     ]
 }
 
-/// Redacts any view whose visible text matches one of a set of patterns.
+/// The contrast policy: shows everything, hides what it recognises.
 ///
-/// An alternative to `RedactByDefaultDelegate`: that policy hides everything
-/// and reveals what is named, this one shows everything and hides what it
-/// recognises.
-///
-/// - Important: this reads UIKit views. SwiftUI does not draw text through
-///   `UILabel`, so a subview walk over hosted SwiftUI content finds nothing —
-///   which is why the UIKit payment screens exist alongside the SwiftUI ones.
+/// Reads UIKit text only — SwiftUI does not draw through `UILabel`, which is why
+/// the UIKit payment screens exist alongside the SwiftUI ones.
 final class RedactedByRegexDelegate: NSObject, CobrowseIODelegate {
 
     private let patterns: [RedactionPattern]
@@ -70,21 +63,7 @@ final class RedactedByRegexDelegate: NSObject, CobrowseIODelegate {
         
         guard let root = viewController.viewIfLoaded
             else { return [] }
-
-        // Views belonging to a child view controller are left to that
-        // controller: the SDK tracks every controller that has appeared and
-        // asks each about its own tree, so walking into a child here would walk
-        // the same views again for every ancestor above it.
-        //
-        // That relies on the child actually being tracked, which it is only if
-        // it received `viewWillAppear`. A child added with `addChild` but never
-        // given its appearance transitions is visible and untracked, and its
-        // content would be skipped here and asked about nowhere — visible to the
-        // agent. Containment done properly is fine; containment done halfway is
-        // not, and this is where that would show.
-        //
-        // `viewIfLoaded`, so asking never forces a controller to load a view it
-        // has not needed yet.
+        
         let childRoots = Set(viewController.children.compactMap(\.viewIfLoaded))
 
         var found: [UIView] = []
@@ -92,12 +71,7 @@ final class RedactedByRegexDelegate: NSObject, CobrowseIODelegate {
 
         return found
     }
-
-    /// Walks once, matching as it goes.
-    ///
-    /// One traversal and one array, rather than collecting every text view and
-    /// filtering afterwards: this runs on the main thread on every captured
-    /// frame, once per tracked controller.
+    
     private func collectMatches(
         in view: UIView,
         skipping childRoots: Set<UIView>,
@@ -142,11 +116,7 @@ final class RedactedByRegexDelegate: NSObject, CobrowseIODelegate {
             collectMatches(in: subview, skipping: childRoots, into: &found)
         }
     }
-
-    /// The first pattern this text matches, or `nil` for none.
-    ///
-    /// First, not all: one match is enough to hide the view, so there is
-    /// nothing to learn from the rest.
+    
     private func firstMatch(in text: String) -> RedactionPattern? {
         
         patterns.first { text.contains($0.regex) }
@@ -158,19 +128,15 @@ final class RedactedByRegexDelegate: NSObject, CobrowseIODelegate {
 
 /// A view that puts text on screen.
 ///
-/// A protocol rather than a `switch` over view types: one conformance check per
-/// view instead of one per kind, and a new kind is added by conforming it rather
-/// than by editing the walk.
+/// A protocol rather than a `switch` over view types, so a new kind is added by
+/// conforming it rather than by editing the walk.
 protocol ShowsText {
-
-    /// Every piece of text this view shows. More than one, because a text field
-    /// shows what has been typed and, when nothing has, its placeholder.
+    
     var shownText: [String] { get }
 }
 
 extension ShowsText {
-
-    /// Drops what is absent or empty, so callers can list candidates plainly.
+    
     func onScreen(_ candidates: String?...) -> [String] {
         candidates
             .compactMap { $0 }
